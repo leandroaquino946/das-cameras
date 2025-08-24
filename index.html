@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistema para geração de ofícios de requisição de imagens - DAS/PCERJ">
     <title>DAS/PCERJ - Requisição de Imagens</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/das-cameras/css/styles.css">
 </head>
 <body>
     <!-- Cabeçalho -->
@@ -138,23 +138,12 @@
                 <!-- Seção 5: Preferências de Entrega -->
                 <section class="form-section">
                     <h2 class="section-title">5. Preferências de Recebimento</h2>
-                    
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="preferNuvem" name="preferNuvem" class="checkbox">
-                            <span class="checkbox-text">Link em nuvem com permissão de edição (Google Drive/OneDrive/Dropbox)</span>
-                        </label>
-
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="preferWhats" name="preferWhats" class="checkbox">
-                            <span class="checkbox-text">Envio via WhatsApp: 21 98596-7060</span>
-                        </label>
-
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="preferPendrive" name="preferPendrive" class="checkbox">
-                            <span class="checkbox-text">Pen drive mediante agendamento</span>
-                        </label>
-                    </div>
+                    <p>As imagens devem ser recebidas por:</p>
+                    <ul>
+                        <li>Link em nuvem com permissão de edição (Google Drive/OneDrive/Dropbox)</li>
+                        <li>Envio via WhatsApp: 21 98596-7060</li>
+                        <li>Pen drive mediante agendamento</li>
+                    </ul>
                 </section>
 
                 <!-- Seção 6: Anexos -->
@@ -250,11 +239,11 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script src="js/validation.js"></script>
-    <script src="js/geolocation.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/pdf-generator.js"></script>
-    <script src="js/app.js"></script>
+    <script src="/das-cameras/js/validation.js"></script>
+    <script src="/das-cameras/js/geolocation.js"></script>
+    <script src="/das-cameras/js/camera.js"></script>
+    <script src="/das-cameras/js/pdf-generator.js"></script>
+    <script src="/das-cameras/js/app.js"></script>
 </body>
 </html>
 
