@@ -1,0 +1,181 @@
+Segue o **prompt único**, já adaptado para você colar diretamente no Manus. Ele pede um site mobile-first, coleta geolocalização (endereço + coordenadas), permite tirar/enviar fotos da câmera identificada, compõe o ofício com o texto padrão, valida campos e gera **PDF A4** para baixar/compartilhar.
+
+---
+
+# MANUS – SITE “REQUISIÇÃO DE IMAGENS (DAS/PCERJ)”
+
+Crie um site **mobile-first** (PT-BR) para policiais civis em campo gerarem **Ofício de Requisição de Imagens** com:
+
+1. geolocalização automática (endereço + coordenadas),
+2. opção de tirar fotos da câmera identificada,
+3. montagem do texto padrão do ofício com as informações coletadas,
+4. exportação em **PDF A4** (baixar/compartilhar).
+
+## Regras gerais
+
+* Idioma: Português (Brasil).
+* Fuso horário: **America/Sao\_Paulo (UTC-3)**.
+* Página única, cabeçalho: “DAS/PCERJ – Requisição de Imagens”.
+* Layout **mobile-first**, acessível (rótulos claros, botões grandes, alto contraste).
+* Funcionamento local (sem backend). Dados descartados ao limpar/sair.
+* Oferecer **Pré-visualização** antes do PDF.
+
+## Permissões e automações
+
+* Ao abrir, solicitar **localização** (Geolocation API).
+
+  * Se sucesso: capturar **latitude/longitude** (6 casas decimais) e realizar **reverse geocoding** para logradouro/número/bairro/cidade/UF/CEP. Se o Manus não suportar geocoding nativo, preencher o endereço com um campo **editável** e exibir as coordenadas capturadas.
+  * Se negada/falha: habilitar **entrada manual** de endereço e coordenadas.
+* Perguntar: “Deseja inserir **foto(s)** da câmera identificada?”
+
+  * Se “Sim”: abrir câmera do celular com `<input type="file" accept="image/*" capture="environment" multiple>` (limitar a **1–3** fotos). Exibir miniaturas e metadados (data/hora EXIF quando disponível).
+  * Calcular e exibir **SHA-256** de cada foto (para cadeia de custódia) – o hash deve constar no **rodapé do PDF**.
+* Inserir **carimbo temporal** local em todos os registros (data/hora local).
+
+## Formulário (seções e campos)
+
+### 1) Identificação do Procedimento
+
+* **Data do Ofício**\*: default = hoje (dd/mm/aaaa).
+* **Procedimento (nº/ano)**\*: ex. “907-00059/2025”.
+* **Unidade**: valor fixo “DELEGACIA ANTISSEQUESTRO – DAS/PCERJ”.
+
+### 2) Local da Câmera (endereço requisitado)
+
+* **Endereço completo**\*: auto via geolocalização, sempre **editável**.
+* **Latitude** e **Longitude**: readonly se capturadas (6 casas), editáveis se manual.
+* **Ponto de referência** (opcional).
+
+### 3) Período das Imagens
+
+* **Início (data/hora)**\*: dd/mm/aaaa HH\:mm (24h).
+* **Término (data/hora)**\*: dd/mm/aaaa HH\:mm (24h).
+* **Validação**: término > início; exibir versão legível (“das 14h30 do dia 24/08/2025 às 16h00 do dia 24/08/2025”).
+
+### 4) Responsável/Contato do Estabelecimento (opcional)
+
+* **Nome do Proprietário/Responsável**
+* **Telefone/WhatsApp**
+* **E-mail**
+
+### 5) Arquivos & Entrega (preferências de recebimento)
+
+Checkboxes (opcionais):
+
+* [ ] Link em nuvem com **permissão de edição** (Google Drive/OneDrive/Dropbox ou equivalente).
+* [ ] Envio via **WhatsApp**: 21 98596-7060.
+* [ ] **Pen drive** mediante agendamento.
+
+### 6) Anexos (opcional)
+
+* **Fotos**: 1 a 3 imagens capturadas no local (mostrar nome do arquivo, tamanho, SHA-256).
+
+### 7) Observações (opcional)
+
+* Texto livre (ex.: posição da câmera, acesso ao DVR, nome lógico da câmera, pontos cegos).
+
+## Fluxo e botões
+
+* **\[Pré-visualizar Ofício]** → montar o texto completo com os campos preenchidos.
+* **\[Gerar PDF]** → exportar **PDF A4**, com:
+
+  * Cabeçalho com título e (se possível) brasão discreto da PCERJ.
+  * Rodapé técnico (ver abaixo).
+* **\[Baixar PDF]** e **\[Compartilhar]** (usar `navigator.share` quando disponível).
+* **\[Limpar / Novo]** para reiniciar.
+* **\[Exportar JSON] / \[Importar JSON]** (opções avançadas, para auditoria/continuidade).
+
+## Validações obrigatórias
+
+* Procedimento preenchido.
+* Início < Término.
+* Endereço preenchido (auto ou manual).
+* Se houver foto(s), exibir **SHA-256** calculado.
+* **Gerar PDF** somente quando os obrigatórios estiverem válidos.
+
+## Formatação (datas, horas, coordenadas)
+
+* Datas: dd/mm/aaaa; Horas: 24h (HH\:mm).
+* Endereço: linha única no documento, incluir “(Coordenadas: \[LAT], \[LON])”.
+* Coordenadas com **6 casas decimais** (ex.: −22.970722, −43.186966).
+* Ocultar blocos opcionais **vazios** na renderização (ex.: “Observações:” só se houver texto).
+
+## Rodapé técnico do PDF
+
+Inserir automaticamente:
+
+* “Gerado em: \[data/hora local America/Sao\_Paulo]”
+* “Coordenadas: \[lat, lon]”
+* Se houver fotos: “Anexos (hashes): nome.ext – SHA256: …” (uma linha por arquivo)
+* “Ref.: \[bairro]/\[cidade] – \[N\_PROC]”
+
+## Aviso de privacidade (na página)
+
+“Dados coletados exclusivamente para geração do ofício. Nada é enviado automaticamente a servidores de terceiros.”
+
+## TEXTO PADRÃO DO OFÍCIO (usar exatamente este conteúdo, substituindo colchetes)
+
+> Preencher os colchetes com os dados do formulário e geolocalização. Respeitar parágrafos/linhas.
+
+```
+OFÍCIO REQUISIÇÃO DE IMAGENS
+
+DATA: [DATA_DO_OFICIO]                                                            Procedimento: [N_PROC]
+
+Srº. Proprietário / Responsável
+
+A Polícia Civil do Estado do Rio de Janeiro, por intermédio da DELEGACIA ANTISSEQUESTRO, no uso de suas atribuições legais, com fulcro no disposto nos artigos 6º, III e 13, II, ambos do Código de Processo Penal, vem, por meio deste, REQUISITA a V.S.ª as imagens do circuito de vigilância/monitoramento instaladas no endereço:
+
+[ENDERECO_COMPLETO]
+(Coordenadas: [LAT], [LON])
+
+visando à instrução em procedimento inquisitivo instaurado nesta Unidade de Polícia Judiciária.
+
+Para os devidos fins, as imagens devem corresponder ao seguinte período: 
+
+das [HORA_INICIO] do dia [DATA_INICIO] às [HORA_FIM] do dia [DATA_FIM].
+
+Para maior celeridade e eficiência no compartilhamento das informações, solicita-se, preferencialmente, que os arquivos sejam disponibilizados em plataformas de armazenamento em nuvem, tais como Google Drive, OneDrive, Dropbox ou equivalente, mediante a geração de um link para compartilhamento com permissão de edição dos arquivos, a ser encaminhado para os seguintes endereços de e-mail listados abaixo.
+
+Alternativamente, o link para compartilhamento também poderá ser encaminhado para o número de telefone 2198596-7060 (via aplicativo WhatsApp).
+
+Reforça-se que, para o adequado manuseio e análise do material requisitado, é imprescindível que os arquivos compartilhados estejam habilitados para EDIÇÃO.
+
+Além disso, disponibilizamos a opção de entrega dos arquivos em PEN DRIVE, bastando para isso que seja realizado contato prévio para definirmos a forma de buscarmos o dispositivo. Os agendamentos podem ser feitos por meio dos contatos listados abaixo.
+
+Ressalto, que o não atendimento a presente REQUISIÇÃO sujeitará o responsável às penas do CRIME DE DESOBEDIÊNCIA previsto no artigo 330 do Código Penal.
+
+Por fim, imperioso advertir que a manipulação, apagamento ou qualquer modificação dos dados e imagens ora requisitados poderá acarretar no CRIME DE FRAUDE PROCESSUAL conforme prevê o artigo 347 do Código Penal.
+
+Para maiores informações favor entrar em contato através dos contatos: 
+E-mail:  das.delegaciaantissequestro@gmail.com ou laquino@pcivil.rj.gov.br
+Telefone (WhatsApp): 2198596-7060
+
+[SE_OBSERVACOES_EXISTIREM:
+Observações: [OBSERVACOES]
+]
+
+[SE_CONTATO_RESPONSAVEL_PREENCHIDO:
+Responsável no local: [RESP_NOME] – [RESP_TELEFONE] – [RESP_EMAIL]
+]
+
+Atenciosamente, 
+
+_________________________
+Assinado por ordem do LEANDRO AQUINO GOUGET
+Delegado de Polícia, ID 565560-9
+```
+
+## Implementação técnica mínima (sugestões para o Manus)
+
+* Inputs HTML com IDs previsíveis:
+  `dataOficio, nProc, unidade, endereco, lat, lon, referencia, inicio, termino, respNome, respTel, respEmail, preferNuvem, preferWhats, preferPendrive, fotos[], observacoes`.
+* Ao **Pré-visualizar**, montar uma **string** substituindo tokens `[TOKEN]`.
+* Para PDF, usar motor nativo do Manus ou biblioteca de exportação para **A4** com margens 20 mm e fonte legível.
+* Cálculo de **SHA-256** em JS (Web Crypto API).
+* `navigator.geolocation.getCurrentPosition` para coordenadas; `navigator.share` quando suportado.
+* Garantir máscaras/validações de data/hora no padrão brasileiro.
+
+---
+
+Se quiser, posso fornecer uma versão “compacta” do prompt ou um esqueleto HTML/JS para colar no Manus com IDs e substituição já prontos.

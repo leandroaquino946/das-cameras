@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema para geração de ofícios de requisição de imagens - DAS/PCERJ">
+    <title>DAS/PCERJ - Requisição de Imagens</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">DAS/PCERJ – Requisição de Imagens</h1>
+            <p class="header-subtitle">Delegacia Antissequestro - Polícia Civil do Estado do Rio de Janeiro</p>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="main">
+        <div class="container">
+            <!-- Alertas e Status -->
+            <div id="alerts" class="alerts" aria-live="polite"></div>
+
+            <!-- Formulário Principal -->
+            <form id="oficioForm" class="form" novalidate>
+                
+                <!-- Seção 1: Identificação do Procedimento -->
+                <section class="form-section">
+                    <h2 class="section-title">1. Identificação do Procedimento</h2>
+                    
+                    <div class="form-group">
+                        <label for="dataOficio" class="form-label required">Data do Ofício</label>
+                        <input type="date" id="dataOficio" name="dataOficio" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nProc" class="form-label required">Procedimento (nº/ano)</label>
+                        <input type="text" id="nProc" name="nProc" class="form-input" 
+                               placeholder="Ex: 907-00059/2025" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unidade" class="form-label">Unidade</label>
+                        <input type="text" id="unidade" name="unidade" class="form-input" 
+                               value="DELEGACIA ANTISSEQUESTRO – DAS/PCERJ" readonly>
+                    </div>
+                </section>
+
+                <!-- Seção 2: Local da Câmera -->
+                <section class="form-section">
+                    <h2 class="section-title">2. Local da Câmera</h2>
+                    
+                    <div class="geolocation-controls">
+                        <button type="button" id="getLocationBtn" class="btn btn-secondary">
+                            📍 Obter Localização Atual
+                        </button>
+                        <span id="locationStatus" class="location-status"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endereco" class="form-label required">Endereço Completo</label>
+                        <textarea id="endereco" name="endereco" class="form-textarea" rows="3" 
+                                  placeholder="Rua, número, bairro, cidade, UF, CEP" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lat" class="form-label">Latitude</label>
+                            <input type="text" id="lat" name="lat" class="form-input" 
+                                   placeholder="-22.970722" pattern="-?\d+\.\d{6}">
+                        </div>
+                        <div class="form-group">
+                            <label for="lon" class="form-label">Longitude</label>
+                            <input type="text" id="lon" name="lon" class="form-input" 
+                                   placeholder="-43.186966" pattern="-?\d+\.\d{6}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referencia" class="form-label">Ponto de Referência</label>
+                        <input type="text" id="referencia" name="referencia" class="form-input" 
+                               placeholder="Ex: Próximo ao shopping, em frente à escola">
+                    </div>
+                </section>
+
+                <!-- Seção 3: Período das Imagens -->
+                <section class="form-section">
+                    <h2 class="section-title">3. Período das Imagens</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataInicio" class="form-label required">Data Início</label>
+                            <input type="date" id="dataInicio" name="dataInicio" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="horaInicio" class="form-label required">Hora Início</label>
+                            <input type="time" id="horaInicio" name="horaInicio" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataFim" class="form-label required">Data Término</label>
+                            <input type="date" id="dataFim" name="dataFim" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="horaFim" class="form-label required">Hora Término</label>
+                            <input type="time" id="horaFim" name="horaFim" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div id="periodoPreview" class="periodo-preview"></div>
+                </section>
+
+                <!-- Seção 4: Responsável/Contato -->
+                <section class="form-section">
+                    <h2 class="section-title">4. Responsável/Contato do Estabelecimento</h2>
+                    
+                    <div class="form-group">
+                        <label for="respNome" class="form-label">Nome do Proprietário/Responsável</label>
+                        <input type="text" id="respNome" name="respNome" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="respTel" class="form-label">Telefone/WhatsApp</label>
+                        <input type="tel" id="respTel" name="respTel" class="form-input" 
+                               placeholder="(21) 99999-9999">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="respEmail" class="form-label">E-mail</label>
+                        <input type="email" id="respEmail" name="respEmail" class="form-input" 
+                               placeholder="contato@exemplo.com">
+                    </div>
+                </section>
+
+                <!-- Seção 5: Preferências de Entrega -->
+                <section class="form-section">
+                    <h2 class="section-title">5. Preferências de Recebimento</h2>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="preferNuvem" name="preferNuvem" class="checkbox">
+                            <span class="checkbox-text">Link em nuvem com permissão de edição (Google Drive/OneDrive/Dropbox)</span>
+                        </label>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="preferWhats" name="preferWhats" class="checkbox">
+                            <span class="checkbox-text">Envio via WhatsApp: 21 98596-7060</span>
+                        </label>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="preferPendrive" name="preferPendrive" class="checkbox">
+                            <span class="checkbox-text">Pen drive mediante agendamento</span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Seção 6: Anexos -->
+                <section class="form-section">
+                    <h2 class="section-title">6. Anexos</h2>
+                    
+                    <div class="photo-controls">
+                        <button type="button" id="addPhotoBtn" class="btn btn-secondary">
+                            📷 Adicionar Fotos da Câmera
+                        </button>
+                        <input type="file" id="photoInput" accept="image/*" capture="environment" 
+                               multiple style="display: none;">
+                    </div>
+
+                    <div id="photoPreview" class="photo-preview"></div>
+                </section>
+
+                <!-- Seção 7: Observações -->
+                <section class="form-section">
+                    <h2 class="section-title">7. Observações</h2>
+                    
+                    <div class="form-group">
+                        <label for="observacoes" class="form-label">Observações Adicionais</label>
+                        <textarea id="observacoes" name="observacoes" class="form-textarea" rows="4" 
+                                  placeholder="Ex: posição da câmera, acesso ao DVR, nome lógico da câmera, pontos cegos..."></textarea>
+                    </div>
+                </section>
+
+            </form>
+
+            <!-- Controles de Ação -->
+            <div class="action-controls">
+                <button type="button" id="previewBtn" class="btn btn-primary">
+                    👁️ Pré-visualizar Ofício
+                </button>
+                
+                <button type="button" id="generatePdfBtn" class="btn btn-success" disabled>
+                    📄 Gerar PDF
+                </button>
+                
+                <button type="button" id="clearBtn" class="btn btn-secondary">
+                    🗑️ Limpar / Novo
+                </button>
+            </div>
+
+            <!-- Controles Avançados -->
+            <details class="advanced-controls">
+                <summary>Opções Avançadas</summary>
+                <div class="advanced-buttons">
+                    <button type="button" id="exportJsonBtn" class="btn btn-outline">
+                        📤 Exportar JSON
+                    </button>
+                    <button type="button" id="importJsonBtn" class="btn btn-outline">
+                        📥 Importar JSON
+                    </button>
+                    <input type="file" id="jsonInput" accept=".json" style="display: none;">
+                </div>
+            </details>
+
+        </div>
+    </main>
+
+    <!-- Modal de Pré-visualização -->
+    <div id="previewModal" class="modal" role="dialog" aria-labelledby="previewTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="previewTitle">Pré-visualização do Ofício</h3>
+                <button type="button" id="closePreviewBtn" class="modal-close" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent" class="preview-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="editBtn" class="btn btn-secondary">Editar</button>
+                <button type="button" id="confirmPdfBtn" class="btn btn-success">Gerar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="container">
+            <div class="privacy-notice">
+                <p><strong>Aviso de Privacidade:</strong> Dados coletados exclusivamente para geração do ofício. 
+                Nada é enviado automaticamente a servidores de terceiros.</p>
+            </div>
+            <div class="footer-info">
+                <p>Sistema desenvolvido para a Delegacia Antissequestro - DAS/PCERJ</p>
+                <p>Contatos: das.delegaciaantissequestro@gmail.com | (21) 98596-7060</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/geolocation.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/pdf-generator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
